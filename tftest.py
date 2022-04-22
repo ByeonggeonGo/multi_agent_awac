@@ -10,8 +10,8 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 from time import time
 
-print(tf.__version__)
-print(device_lib.list_local_devices())
+# print(tf.__version__)
+# print(device_lib.list_local_devices())
 
 # params of multi_AWAC
 agent_num = 5
@@ -69,6 +69,18 @@ def get_mean_qsa(qs,sampled_as):
     mean_q = tf.math.reduce_mean(mean_q,axis=1,keepdims=True)
     return mean_q
 
+actor_list, critic_qnet_list, critic_qnet_target_list = build_structure(agent_num, hidden_structure,input_shape,act_function,output_shape)
+# 메모리에서 아래와같이 샘플링됐다고 가정하고 테스트(메모리 아직 안만들어짐)
+s = np.array([[1,2,1,2,1,2,1,2,1,2,],[2,3,1,2,1,2,3,2,6,7,],[1,4,14,2,1,2,11,2,9,2,]])
+ns = np.array([[1,29,1,2,10,2,1,29,1,28,],[17,2,16,2,1,21,1,2,1,22,],[1,21,1,22,1,2,7,2,5,2,]])
+a = np.array([[0],[1],[1],])
+r = np.array([[2],[4.2],[2.7],])
+done = np.array([[0],[0],[0],])
+sample_dataset_by_agent = [s, ns, a, r, done]
+dataset_list = [sample_dataset_by_agent,sample_dataset_by_agent,sample_dataset_by_agent,sample_dataset_by_agent,sample_dataset_by_agent]
+
+
+
 
 
 
@@ -76,15 +88,6 @@ def get_mean_qsa(qs,sampled_as):
 print("CPU를 사용한 학습")
 with tf.device("/device:CPU:0"):
     start_time = time()
-    actor_list, critic_qnet_list, critic_qnet_target_list = build_structure(agent_num, hidden_structure,input_shape,act_function,output_shape)
-    # 메모리에서 아래와같이 샘플링됐다고 가정하고 테스트(메모리 아직 안만들어짐)
-    s = np.array([[1,2,1,2,1,2,1,2,1,2,],[2,3,1,2,1,2,3,2,6,7,],[1,4,14,2,1,2,11,2,9,2,]])
-    ns = np.array([[1,29,1,2,10,2,1,29,1,28,],[17,2,16,2,1,21,1,2,1,22,],[1,21,1,22,1,2,7,2,5,2,]])
-    a = np.array([[0],[1],[1],])
-    r = np.array([[2],[4.2],[2.7],])
-    done = np.array([[0],[0],[0],])
-    sample_dataset_by_agent = [s, ns, a, r, done]
-    dataset_list = [sample_dataset_by_agent,sample_dataset_by_agent,sample_dataset_by_agent,sample_dataset_by_agent,sample_dataset_by_agent]
     epoch = 100
     for i in range(epoch):
         with tf.GradientTape() as t:
@@ -156,15 +159,6 @@ with tf.device("/device:CPU:0"):
 print("GPU를 사용한 학습")
 with tf.device("/device:GPU:0"):
     start_time = time()
-    actor_list, critic_qnet_list, critic_qnet_target_list = build_structure(agent_num, hidden_structure,input_shape,act_function,output_shape)
-    # 메모리에서 아래와같이 샘플링됐다고 가정하고 테스트(메모리 아직 안만들어짐)
-    s = np.array([[1,2,1,2,1,2,1,2,1,2,],[2,3,1,2,1,2,3,2,6,7,],[1,4,14,2,1,2,11,2,9,2,]])
-    ns = np.array([[1,29,1,2,10,2,1,29,1,28,],[17,2,16,2,1,21,1,2,1,22,],[1,21,1,22,1,2,7,2,5,2,]])
-    a = np.array([[0],[1],[1],])
-    r = np.array([[2],[4.2],[2.7],])
-    done = np.array([[0],[0],[0],])
-    sample_dataset_by_agent = [s, ns, a, r, done]
-    dataset_list = [sample_dataset_by_agent,sample_dataset_by_agent,sample_dataset_by_agent,sample_dataset_by_agent,sample_dataset_by_agent]
     epoch = 100
     for i in range(epoch):
         with tf.GradientTape() as t:
